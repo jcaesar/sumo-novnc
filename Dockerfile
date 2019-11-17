@@ -1,20 +1,11 @@
-#
-# A dockerfile to run X11 through the browser with noVNC
-# Inspired by
-# https://github.com/codenvy/dockerfiles/tree/master/x11_vnc 
-#
-# BUILD DOCKER:	docker build -t              toastie/x11-novnc .
-# RUN DOCKER:	docker run  -it -p 8080:8080 toastie/x11-novnc 
-# TEST DOCKER:	docker exec -it -p 8080:8080 toastie/x11-novnc /bin/bash
-
 FROM ubuntu:eoan
 
 # Installing apps and clean up.
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && apt-get -y install \
     ca-certificates \
-    fluxbox \
     fonts-takao-gothic \
+    i3 \
     locales \
     mozc-server \
     net-tools \
@@ -31,12 +22,14 @@ RUN apt-get update && apt-get -y install \
 RUN ln -snf /usr/share/zoneinfo/Asia/Tokyo /etc/localtime \
  && echo ja_JP.UTF-8 UTF-8 >>/etc/locale.gen \
  && locale-gen && dpkg-reconfigure tzdata \
- && adduser --gecos "" --disabled-password sumo
+ && adduser --gecos "" --disabled-password sumo \
+ && useradd --system --no-create-home novnc
 
 # Expose Port
 EXPOSE 8080
 
 # Configure & run supervisor
-COPY novnc.conf /etc/supervisor/conf.d/novnc.conf
+COPY supervisor.conf /etc/supervisor/conf.d/sumo.conf
 COPY novnc-autostart.html /usr/share/novnc/index.html
+COPY i3config /home/sumo/.config/i3/config
 ENTRYPOINT ["/usr/bin/supervisord"]
