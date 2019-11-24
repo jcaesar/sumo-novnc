@@ -1,4 +1,4 @@
-FROM ubuntu:eoan
+FROM docker.io/library/ubuntu:eoan
 
 # Installing apps and clean up.
 ENV DEBIAN_FRONTEND noninteractive
